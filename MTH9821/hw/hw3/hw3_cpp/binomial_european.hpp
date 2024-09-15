@@ -1,12 +1,17 @@
-#ifndef BinomialEuropean_hpp
+#ifndef BinomialEuropean_hpp 
 #define BinomialEuropean_hpp
 
+/*
 #include <iostream>
 #include <cmath>
 #include <string>
 #include <vector>
+*/
 #include "black_scholes.hpp"
+#include "binomial_option.hpp"
 
+#ifndef Option_value
+#define Option_value
 double option_value(double K, double S, std::string type)
 {
     if (type == "call")
@@ -23,10 +28,12 @@ double option_value(double K, double S, std::string type)
     }
     return 0.0;
 }
+#endif
 
-class BinomialEuropean
+class BinomialEuropean : public BinomialOption
 {
 private:
+    /*
     double S0, K, r, sigma, T, q;
     double dt;
     int N;
@@ -34,7 +41,8 @@ private:
     double disc_p, disc_1p;
     std::string type;
     std::string method;
-    std::vector<std::string> methods{"Binomial", "AverageBinomial", "BBS", "BBSR"};
+    */
+    std::vector<std::string> methods{"Binomial", "AverageBinomial", "BBS", "BBSR"}; // KEEP THIS and below
     double S_temp;
     std::vector<double> V;
     double V10, V11, V20, V21, V22;
@@ -42,7 +50,9 @@ private:
 
 public:
     BinomialEuropean(double S0_, double K_, double r_, double sigma_, double T_, double q_, int N_, std::string method_, std::string type_)
+        : BinomialOption(S0_, K_, r_, sigma_, T_, q_, N_, method_, type_)
     {
+        /*
         S0 = S0_;
         K = K_;
         r = r_;
@@ -58,6 +68,7 @@ public:
         d_bar = pow(d, 2);
         disc_p = exp(-r * dt) * (exp((r - q) * dt) - d) / (u - d);
         disc_1p = exp(-r * dt) - disc_p;
+        */
         if (method == "Binomial")
         {
             S_temp = S0 * pow(u, N);
@@ -176,6 +187,7 @@ public:
         else
         {
             std::cout << "Method not found!" << std::endl;
+            std::cout << "Method tried: " << method << std::endl;
         }
     }
 };

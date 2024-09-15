@@ -1,4 +1,4 @@
-#ifndef BlackScholes_hpp
+#ifndef BlackScholes_hpp 
 #define BlackScholes_hpp
 
 #include <iostream>
@@ -30,18 +30,22 @@ std::map<std::string, double> black_scholes_values(double S, double K, double T,
     double gamma = std::exp(-q * T) * pdf(norm_dist, d1) / (S * sigma * std::sqrt(T));
 
     // Theta
-    double theta_call = -S * sigma * std::exp(-q * T) * pdf(norm_dist, d1) / (2 * std::sqrt(T)) - r * K * std::exp(-r * T) * cdf(norm_dist, d2) + q * S * std::exp(-q * T) * cdf(norm_dist, d1);
-    double theta_put = -S * sigma * std::exp(-q * T) * pdf(norm_dist, d1) / (2 * std::sqrt(T)) + r * K * std::exp(-r * T) * cdf(norm_dist, -d2) - q * S * std::exp(-q * T) * cdf(norm_dist, -d1);
+    double theta_call = (-S * std::exp(-q * T) * pdf(norm_dist, d1) * sigma) / (2 * std::sqrt(T))
+                   - r * K * std::exp(-r * T) * cdf(norm_dist, d2)
+                   + q * S * std::exp(-q * T) * cdf(norm_dist, d1);
+    double theta_put = (-S * std::exp(-q * T) * pdf(norm_dist, d1) * sigma) / (2 * std::sqrt(T))
+                  + r * K * std::exp(-r * T) * cdf(norm_dist, -d2)
+                  - q * S * std::exp(-q * T) * cdf(norm_dist, -d1);
 
     return {
         {"call_price", call_price},
         {"put_price", put_price},
         {"call_delta", delta_call},
         {"put_delta", delta_put},
-        {"vega", vega},
-        {"gamma", gamma},
         {"call_theta", theta_call},
-        {"put_theta", theta_put}};
+        {"put_theta", theta_put},
+        {"vega", vega},
+        {"gamma", gamma}};
 }
 
 #endif
