@@ -270,6 +270,133 @@ int main()
                 << std::endl;
         }
     }
+        std::cout << "\n---Basket Options---\n" << std::endl;
+    { // Basket Options
+        std::vector<int> n;
+        double K = 50;
+        double S10 = 26;
+        double S20 = 29;
+        double T = 0.5;
+        double r = 0.025;
+        double q = 0.0;
+        double sigma1 = 0.31;
+        double sigma2 = 0.21;
+        double rho = 0.3;
+
+        for (int i = 0; i < 9; ++i)
+        {
+            n.push_back(10000 * (1 << i)); // 
+        }
+
+        std::vector<double> V_n_hat_list;
+        //std::vector<double> error_list;
+
+        auto uniform_generator = LinearCongruentialGenerator();
+        auto normal_generator = MarsagliaBrayNormalGenerator(uniform_generator);
+
+        for (auto nn : n)
+        {
+            std::vector<double> Si_list;
+            std::vector<double> Vi_list;
+
+            for (int i = 0; i < nn; ++i)
+            {
+                double zi1 = normal_generator.generate();
+                double zi2 = normal_generator.generate();
+
+                // 计算Si1和Si2
+                double Si1 = S10 * std::exp((r - 0.5 * sigma1 * sigma1) * T + sigma1 * std::sqrt(T) * zi1);
+                double Si2 = S20 * std::exp((r - 0.5 * sigma2 * sigma2) * T + sigma2 * std::sqrt(T) * (rho * zi1 + std::sqrt(1-rho*rho) * zi2));
+
+                Si_list.push_back(Si1+Si2);
+
+                // 计算Vi1和Vi2
+                Vi_list.push_back(std::exp(-r * T) * std::max(Si1+Si2-K, 0.0));
+            }
+
+            // 计算 V_AV_n_hat
+            double V_n_hat = std::accumulate(Vi_list.begin(), Vi_list.end(), 0.0) / Vi_list.size();
+            V_n_hat_list.push_back(V_n_hat);
+
+            // 计算误差
+            //double error = std::abs(V_n_hat - put_res["put_price"]);
+            //error_list.push_back(error);
+
+            // 输出结果
+            std::cout << "n: " << nn
+                      << " V_n_hat: " << V_n_hat
+                      //<< " error: " << error
+                      << std::endl;
+        }
+    }
+
+    std::cout << "\n---Basket Options Path Dependent---\n" << std::endl;
+    { // Basket Options Path Dependent
+        std::vector<int> N;
+        double K = 50;
+        double S10 = 26;
+        double S20 = 29;
+        double T = 0.5;
+        double r = 0.025;
+        double q = 0.0;
+        double sigma1 = 0.31;
+        double sigma2 = 0.21;
+        double rho = 0.3;
+        double m = 150;
+        double n = 50;
+        double dt = T/m;
+        std::cout << "dt: " << dt << std::endl;
+
+        for (int i = 0; i < 10; ++i)
+        {
+            N.push_back(n * (1 << i)); // 
+        }
+
+        std::vector<double> V_n_hat_list;
+
+        auto uniform_generator = LinearCongruentialGenerator();
+        auto normal_generator = MarsagliaBrayNormalGenerator(uniform_generator);
+
+        for (auto nn : N)
+        {
+            std::vector<double> Si_list;
+            std::vector<double> Vi_list;
+
+            for (int i = 0; i < nn; ++i)
+            {
+                double Si1 = S10;
+                double Si2 = S20;
+                for (int j = 0; j < m; ++j)
+                {
+                    double zi1 = normal_generator.generate();
+                    double zi2 = normal_generator.generate();
+
+                    // 计算Si1和Si2
+                    Si1 = Si1 * std::exp((r - 0.5 * sigma1 * sigma1) * dt + sigma1 * std::sqrt(dt) * zi1);
+                    Si2 = Si2 * std::exp((r - 0.5 * sigma2 * sigma2) * dt + sigma2 * std::sqrt(dt) * (rho * zi1 + std::sqrt(1-rho*rho) * zi2));
+                }
+                
+
+                Si_list.push_back(Si1+Si2);
+
+                // 计算Vi1和Vi2
+                Vi_list.push_back(std::exp(-r * T) * std::max(Si1+Si2-K, 0.0));
+            }
+
+            // 计算 V_AV_n_hat
+            double V_n_hat = std::accumulate(Vi_list.begin(), Vi_list.end(), 0.0) / Vi_list.size();
+            V_n_hat_list.push_back(V_n_hat);
+            std::cout << "Vi_list1: " << Vi_list[0] << std::endl;
+            std::cout << "Vi_list2: " << Vi_list[1] << std::endl;
+            std::cout << "Si_list1: " << Si_list[0] << std::endl;
+            std::cout << "Si_list2: " << Si_list[1] << std::endl;
+            // 输出结果
+            std::cout << "n: " << nn
+                      << " V_n_hat: " << V_n_hat
+                      //<< " error: " << error
+                      << std::endl;
+        }
+    }
 
     return 0;
 }
