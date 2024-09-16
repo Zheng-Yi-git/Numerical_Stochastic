@@ -1,6 +1,7 @@
-#include "binomial_european.hpp" 
+#include "binomial_european.hpp"
 #include "binomial_american.hpp"
 #include "binomial_option.hpp"
+#include "binomial_implied_volatility.hpp"
 
 void runBinomialCalculator(BinomialOption& binop, double V_actual, double D_actual, double G_actual, double T_actual, int N){
     binop.runSimulation();
@@ -163,6 +164,26 @@ int main()
             runBinomialCalculator_VR(binomial_american, binomial_european, V_Exact, D_Exact, G_Exact, T_Exact, V_BS, D_BS, G_BS, T_BS, N);
         }
     }
+
+    { // Implied Volatility Computation with Binomial Trees
+
+        double marketPrice = 6.36;  // Market Price of the put option
+        double S0 = 58.0;           // current price of underlying stock
+        double K = 60.0;            // strike price
+        double r = 0.02;            // risk-free rate
+        double T = 0.75;            // time of maturity, 9 months
+        double q = 0.01;            // stock payment rate
+        std::string type = "put";   // type of option
+
+        // Find N
+        int N_fixed = find_N_fixed(sigma, S0, K, r, T, q, type);
+
+        // Calculate implied volatility
+        double impliedVol = impliedVolatility_BBSR(marketPrice, S0, K, r, T, q, N_fixed, type);
+        std::cout << "Implied Volatility (BBSR Model): " << impliedVol << std::endl;
+
+    }
+
 
     return 0;
 }
