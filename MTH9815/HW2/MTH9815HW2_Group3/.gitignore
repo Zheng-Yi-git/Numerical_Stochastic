@@ -1,0 +1,8 @@
+.vscode/
+.DS_Store
+q1/.DS_Store
+q1/shared_memory
+q1/shared_memory.dSYM/
+q2_q3/.DS_Store
+q2_q3/test_products
+q2_q3/test_products.dSYM/
